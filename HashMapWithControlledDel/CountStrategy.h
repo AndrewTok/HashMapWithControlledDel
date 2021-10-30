@@ -14,7 +14,7 @@ class CountStrategy final : public Strategy<KeyType>
 	using iterator = typename std::unordered_map<KeyType, size_t>::iterator;
 
 public:
-	CountStrategy(size_t _numberWhenDel) : numberWhenDel(_numberWhenDel + 1) {}
+	CountStrategy(size_t _numberWhenDel) : numberWhenDel(_numberWhenDel) {}
 	// insert access remove check
 	virtual action access(const KeyType& key) override
 	{
@@ -30,6 +30,7 @@ public:
 		}
 		else
 		{
+			countTable[key]++;
 			return LOOK;
 		}
 	}

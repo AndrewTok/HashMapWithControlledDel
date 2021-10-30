@@ -27,7 +27,7 @@ private:
 	typedef const value_type& const_reference;
 	typedef typename std::allocator_traits<Allocator>::pointer pointer;
 	typedef typename std::allocator_traits<Allocator>::const_pointer const_pointer;
-	using iterator =  HashMapCDIter;
+	using iterator = HashMapCDIter<KeyType, ValueType>;
 	using umapIterator = typename std::unordered_map<KeyType, ValueType>::iterator;
 	//typedef typename std::unordered_map<KeyType, ValueType>::node_type node_type;
 
@@ -38,7 +38,7 @@ private:
 
 	std::unordered_map<KeyType, ValueType> umap;
 
-	Strategy& strategy; // dynamic polymorphism
+	Strategy<key_type>& strategy; 
 
 
 	iterator getIter(const key_type& key)
@@ -48,22 +48,25 @@ private:
 
 public:
 
-	HashMapControllDel(Strategy& _strategy) : strategy(_strategy) {}
+	HashMapControllDel(Strategy<key_type>& _strategy) : strategy(_strategy) {}
 
 
 	std::pair<iterator, bool> insert(const value_type& _pair) 
 	{
+		// check exsitstance of an element
 		auto result = strategy.insert(_pair.first);
 		if (result == INSERT)
 		{
+			// use default value to insert if dell
 			std::pair<umapIterator, bool> insertedStat = umap.insert(_pair);
-			return std::pair<iterator, bool>(iterator(umap, strategy, insertedStat.first), insertedStat.second);
+			iterator tmpIter(umap, strategy, insertedStat.first);
+			bool success = insertedStat.second;
+			return std::pair<iterator, bool>(tmpIter, success);
 		}
 		else
 		{
 			return std::pair<iterator, bool>(getIter(_pair.first), false);
-		}
-		//return umap.insert(_pair); 
+		} 
 	}
 
 	void erase(key_type& key)
@@ -72,33 +75,41 @@ public:
 		umap.erase(key);
 	}
 
-	value_type& operator[] (key_type& key)
+	ValueType& operator[] (const key_type& key)
 	{
+		// add default value to insert
 		action result = strategy.access(key);
 		if (result == REMOVE)
 		{
 			umap.erase(key);
-			return *this[key];
+			// insert default 
+			return (*this)[key];
 		}
-		else if (result == INSERT || result == LOOK)
+		else if (result == INSERT)
 		{
 			return umap[key];
 		}
+		else if (result == LOOK)
+		{
+			return umap.at(key);
+		}
 		else if (result == UNAVAILABLE)
 		{
-			throw std::out_of_range();
+			throw std::out_of_range("unavailable obj");
 		}
 	}
 
 
-	iterator begin()
+	iterator begin() const 
 	{
-		return iterator(umap, strategy, umap.begin());
+		iterator tmp(umap, strategy, umap.begin());
+		return tmp;
 	}
 
-	iterator end()
+	iterator end() const 
 	{
-		return iterator(umap, strategy, umap.end());
+		iterator tmp(umap, strategy, umap.end());
+		return tmp;
 	}
 
 };

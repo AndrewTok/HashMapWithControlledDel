@@ -4,17 +4,18 @@
 #include <unordered_map>
 
 
-template<class ValueType, class KeyType>
+template<class KeyType, class ValueType>
 class HashMapCDIter final
 {
+	typedef typename std::unordered_map<KeyType, ValueType>::iterator umapIter;
 	typedef std::pair<const KeyType, ValueType> value_type;
 	std::unordered_map<KeyType, ValueType>& umap;
-	Strategy& strategy; 
-	typename std::unordered_map<KeyType, ValueType>::iterator iter;
-	//KeyType& key;
+	Strategy<KeyType>& strategy; 
+	umapIter iter;
+
 public:
 	HashMapCDIter(std::unordered_map<KeyType, ValueType>& _umap, 
-		Strategy& _strategy, std::unordered_map<KeyType, ValueType>::iterator _currIter, KeyType& _key)
+		Strategy<KeyType>& _strategy, umapIter _currIter)
 		: umap(_umap), strategy(_strategy), iter(_currIter) {}
 
 
@@ -22,18 +23,19 @@ public:
 	HashMapCDIter& operator++ () 
 	{
 		++iter;
-		KeyType key = *iter.first();
-		// access??? no
+		KeyType key = (*iter).first;
+		// check if del go next
 		return *this;
 	}
 
 	value_type operator*() const
 	{
+		KeyType key = (*iter).first;
 		action result = strategy.access(key);
 		if (result == REMOVE)
 		{
-			//throw out of range
-
+			umap.erase(key);
+			throw std::out_of_range("unavailable object");
 		}
 		else if (result == LOOK)
 		{
@@ -42,12 +44,12 @@ public:
 		}
 		else if (result == INSERT || result == UNAVAILABLE)
 		{
-			//throw
+			throw std::out_of_range("unavailable object");
 		}
 		
 	}
 
-	bool operator!=(const HashMapCDIter& other) const { return iter == other.iter }
+	bool operator!=(const HashMapCDIter& other) const { return iter == other.iter; }
 
 
 

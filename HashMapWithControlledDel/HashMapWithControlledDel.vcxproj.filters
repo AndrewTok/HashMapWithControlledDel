@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HMapControlledDel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Iterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Strategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
