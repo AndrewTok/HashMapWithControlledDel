@@ -15,37 +15,29 @@ class CountStrategy final : public Strategy<KeyType>
 
 public:
 	CountStrategy(size_t _numberWhenDel) : numberWhenDel(_numberWhenDel) {}
-	// insert access remove check
-	virtual action access(const KeyType& key) override
+
+	virtual bool check(const KeyType& key) override
 	{
-		if (countTable.find(key) == countTable.end())
-		{
-			countTable[key] = 0;
-			return INSERT;
-		}
-		if (countTable[key] == numberWhenDel)
-		{
-			countTable[key] = 0;
-			return REMOVE;
-		}
-		else
-		{
-			countTable[key]++;
-			return LOOK;
-		}
+		return ((countTable.find(key) != countTable.end()) && (countTable[key] != numberWhenDel));
 	}
 
-	virtual action insert(const KeyType& key) override
+
+	virtual bool access(const KeyType& key) override
+	{
+		if (countTable.find(key) != countTable.end() && countTable[key] != numberWhenDel)
+		{
+			++countTable[key];
+			return true;
+		}
+		return false;
+
+	}
+
+	virtual bool insert(const KeyType& key) override
 	{
 		std::pair<iterator, bool> insertResult = countTable.insert(std::pair<const KeyType, size_t>(key, 0));
-		if (insertResult.second == false)
-		{
-			return UNAVAILABLE;
-		}
-		else
-		{
-			return INSERT;
-		}
+		return insertResult.second;
+
 	}
 
 	virtual void remove(const KeyType& key) override

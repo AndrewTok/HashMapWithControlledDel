@@ -23,33 +23,34 @@ public:
 	HashMapCDIter& operator++ () 
 	{
 		++iter;
-		KeyType key = (*iter).first;
-		// check if del go next
+		while (iter != umap.end())
+		{
+			KeyType key = (*iter).first;
+			if (strategy.check(key))
+			{
+				break;
+			}
+			++iter;
+		}
 		return *this;
 	}
 
 	value_type operator*() const
 	{
 		KeyType key = (*iter).first;
-		action result = strategy.access(key);
-		if (result == REMOVE)
+		bool isAccessible = strategy.access(key);
+		if (isAccessible)
 		{
-			umap.erase(key);
-			throw std::out_of_range("unavailable object");
+			return value_type(key, umap.at(key));
 		}
-		else if (result == LOOK)
-		{
-			KeyType key = (*iter).first;
-			return value_type(key, umap[key]);
-		}
-		else if (result == INSERT || result == UNAVAILABLE)
+		else
 		{
 			throw std::out_of_range("unavailable object");
 		}
 		
 	}
 
-	bool operator!=(const HashMapCDIter& other) const { return iter == other.iter; }
+	bool operator!=(const HashMapCDIter& other) const { return iter != other.iter; }
 
 
 
