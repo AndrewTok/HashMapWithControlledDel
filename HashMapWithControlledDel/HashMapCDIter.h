@@ -5,7 +5,7 @@
 
 
 template<class KeyType, class ValueType>
-class HashMapCDIter final
+class HashMapCDIterOld final
 {
 	typedef typename std::unordered_map<KeyType, ValueType>::iterator umapIter;
 	typedef std::pair<const KeyType, ValueType> value_type;
@@ -51,7 +51,5 @@ public:
 	}
 
 	bool operator!=(const HashMapCDIter& other) const { return iter != other.iter; }
-
-
 
 };
