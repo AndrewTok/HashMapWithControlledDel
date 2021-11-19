@@ -149,7 +149,7 @@
     <ClInclude Include="TimeoutStrategy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="empty.cpp" />
+    <ClCompile Include="EmptyFile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

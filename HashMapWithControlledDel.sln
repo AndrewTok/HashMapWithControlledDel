@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HashMapWithControlledDel", "HashMapWithControlledDel\HashMapWithControlledDel.vcxproj", "{F27E1C32-7659-4D51-9FC6-DC3D7552FA49}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "main\main.vcxproj", "{9782F65E-5A40-416A-A8BE-D9B151942229}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F27E1C32-7659-4D51-9FC6-DC3D7552FA49} = {F27E1C32-7659-4D51-9FC6-DC3D7552FA49}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HashMapTests", "HashMapTests\HashMapTests.vcxproj", "{8BA0EE0C-8AD5-476F-AD96-25964686EBA4}"
 EndProject
