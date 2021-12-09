@@ -6,7 +6,7 @@
 //#include "HashMapCDIter.h"
 
 
-template<class ValueType, class KeyType, class Hash = std::hash<KeyType>,
+template<class KeyType, class ValueType, class Hash = std::hash<KeyType>,
 	class KeyEqual = std::equal_to<KeyType>,
 	class Allocator = std::allocator<std::pair<const KeyType, ValueType>>>
 class HashMapControllDel
@@ -100,7 +100,6 @@ public:
 
 	HashMapControllDel(Strategy<key_type>& _strategy) : strategy(_strategy) {}
 
-
 	std::pair<iterator, bool> insert(const value_type& _pair) 
 	{
 
@@ -118,7 +117,7 @@ public:
 		}
 	}
 
-	void erase(key_type&& key)
+	void erase(key_type key) //check why universal doesnt work
 	{
 		strategy.remove(key);
 		umap.erase(key);
