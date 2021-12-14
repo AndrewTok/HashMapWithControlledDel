@@ -54,3 +54,4 @@ TEST(HashMapEmptyStrat, InsertInsertAccessTest)
 		ASSERT_EQ(i + 1, mapDel[std::to_string(i)]);
 	}
 }
+

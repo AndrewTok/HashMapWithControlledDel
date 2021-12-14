@@ -21,9 +21,6 @@
     <ClInclude Include="HashMapControllDel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HashMapCDIter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CountStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>

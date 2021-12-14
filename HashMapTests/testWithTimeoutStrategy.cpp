@@ -7,7 +7,7 @@ void fillMap(HashMapControllDel<int, char>& map, int bound)
 {
 	for (int i = 0; i < bound; ++i)
 	{
-		map[char(i)] = (i * i);
+		map[i] = char(i * i);
 	}
 }
 
@@ -49,14 +49,14 @@ TEST(HashMapTimeoutStrat, InsertAccessNotimeoutTest)
 
 TEST(HashMapTimeoutStrat, InsertAccessTimeoutAccessTest)
 {
-	TimeoutStrategy<int> strat(10);
+	TimeoutStrategy<int> strat(2);
 	HashMapControllDel<int, char> mapDel(strat);
 	char defaultValue{};
 	fillMap(mapDel, 128);
 	time_t startTime = time(0);
 	for (int i = 0; i < 128; ++i)
 	{
-		if (time(0) - startTime < 10)
+		if (time(0) - startTime < 2)
 		{
 			ASSERT_EQ(char(i * i), mapDel[i]);
 		}
@@ -65,10 +65,10 @@ TEST(HashMapTimeoutStrat, InsertAccessTimeoutAccessTest)
 			ASSERT_EQ(defaultValue, mapDel[i]);
 		}
 	}
-	Sleep(10);
+	Sleep(2000);
 	for (int i = 0; i < 128; ++i)
 	{
-		if (time(0) - startTime < 10)
+		if (time(0) - startTime < 2)
 		{
 			ASSERT_EQ(char(i * i), mapDel[i]);
 		}
@@ -86,7 +86,6 @@ TEST(HashMapTimeoutStrat, InsertDeleteAccessTest)
 	HashMapControllDel<int, char> mapDel(strat);
 	char defaultValue{};
 	fillMap(mapDel, 128);
-	//time_t startTime = time(0);
 	for (int i = 0; i < 128; ++i)
 	{
 		ASSERT_EQ(char(i * i), mapDel[i]);
@@ -107,4 +106,79 @@ TEST(HashMapTimeoutStrat, InsertInsertAccessTest)
 		mapDel[i] = i + 1;
 		ASSERT_EQ(char(i + 1), mapDel[i]);
 	}
+}
+
+TEST(HashMapTimeoutStrat, CorrectLoopTest)
+{
+	TimeoutStrategy<int> strat(100);
+	HashMapControllDel<int, char> mapDel(strat);
+	char defaultValue{};
+	fillMap(mapDel, 128);
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		char value = i.second;
+		ASSERT_EQ(value, char(key * key));
+	}
+}
+
+TEST(HashMapTimeoutStrat, PartlyCorrectLoopTest)
+{
+	TimeoutStrategy<int> strat(2);
+	HashMapControllDel<int, char> mapDel(strat);
+	char defaultValue{};
+	fillMap(mapDel, 128);
+	Sleep(1000);
+	for (auto& i : mapDel)
+	{
+		if (i.first % 2 == 0)
+		{
+			mapDel[i.first] = i.first * i.first; // time to live is updated
+		}
+	}
+	Sleep(1000);
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key * key);
+		ASSERT_TRUE(key % 2 == 0);
+	}
+}
+
+TEST(HashMapTimeoutStrat, IncorrectLoopTest)
+{
+	TimeoutStrategy<int> strat(1);
+	HashMapControllDel<int, char> mapDel(strat);
+	char defaultValue{};
+	fillMap(mapDel, 128);
+	Sleep(1000);
+	
+	bool wasInLoop = false;
+	for (auto& i : mapDel)
+	{
+		wasInLoop = true;
+	}
+	ASSERT_FALSE(wasInLoop);
+}
+
+TEST(HashMapTimeoutStrat, IncorrectIteratorTest)
+{
+	TimeoutStrategy<int> strat(2);
+	HashMapControllDel<int, char> mapDel(strat);
+	char defaultValue{};
+	fillMap(mapDel, 128);
+	auto beginIter = mapDel.begin();
+	ASSERT_NE(beginIter, mapDel.end());
+	Sleep(2000);
+	bool exceptionAppears = false;
+	try
+	{
+		char value = (*beginIter).second;
+	}
+	catch (std::out_of_range& e)
+	{
+		exceptionAppears = true;
+	}
+	ASSERT_TRUE(exceptionAppears);
 }

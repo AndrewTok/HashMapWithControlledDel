@@ -5,7 +5,6 @@
 #include <Windows.h>
 #include <iostream>
 
-
 int main()
 {
 	CountStrategy<int> strat(2);
@@ -37,7 +36,5 @@ int main()
 	mapEmpty[2] = 4;
 	mapEmpty[3] = 9;
 	std::cout << mapEmpty[2] << " " << mapEmpty[3] << std::endl;
-	mapEmpty.erase(2);
-	std::cout << mapEmpty[2] << std::endl;
 	
 }

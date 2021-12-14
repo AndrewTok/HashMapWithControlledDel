@@ -143,7 +143,6 @@
   <ItemGroup>
     <ClInclude Include="CountStrategy.h" />
     <ClInclude Include="EmptyStrategy.h" />
-    <ClInclude Include="HashMapCDIter.h" />
     <ClInclude Include="HashMapControllDel.h" />
     <ClInclude Include="Strategy.h" />
     <ClInclude Include="TimeoutStrategy.h" />

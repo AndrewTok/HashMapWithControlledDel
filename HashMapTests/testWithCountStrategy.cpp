@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HashMapControllDel.h"
 #include "CountStrategy.h"
+#include <iostream>
 
 
 template<class Key, class ValueType>
@@ -101,4 +102,91 @@ TEST(HashMapCountStrat, InsertInsertAccessTest)
 		ASSERT_EQ(i+1, mapDel[i]);
 		ASSERT_EQ(7, checkRemainingNumberOfAccesses(mapDel, i, 8));
 	}
+}
+
+TEST(HashMapCountStrat, CorrectLoopTest)
+{
+	CountStrategy<int> strat(1);
+	HashMapControllDel<int, int> mapDel(strat);
+	int defaultValue{};
+	fillMap(mapDel, 128);
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key*key);
+	}
+}
+
+TEST(HashMapCountStrat, PartlyCorrectLoopTest)
+{
+	CountStrategy<int> strat(2);
+	HashMapControllDel<int, int> mapDel(strat);
+	int defaultValue{};
+	fillMap(mapDel, 128);
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key * key);
+		if (key % 2 != 0)
+		{
+			touchElement(mapDel, key, 1);
+		}
+	}
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key * key);
+		ASSERT_TRUE(key % 2 == 0);
+	}
+}
+
+TEST(HashMapCountStrat, IncorrectLoopTest)
+{
+	CountStrategy<int> strat(2);
+	HashMapControllDel<int, int> mapDel(strat);
+	int defaultValue{};
+	fillMap(mapDel, 128);
+	auto beginIter = mapDel.begin();
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key * key);
+		touchElement(mapDel, key, 1);
+	}
+	bool wasInLoop = false;
+	for (auto& i : mapDel)
+	{
+		wasInLoop = true;
+	}
+	ASSERT_FALSE(wasInLoop);
+}
+
+TEST(HashMapCountStrat, IncorrectIteratorTest)
+{
+	CountStrategy<int> strat(2);
+	HashMapControllDel<int, int> mapDel(strat);
+	int defaultValue{};
+	fillMap(mapDel, 128);
+	auto beginIter = mapDel.begin();
+	for (auto& i : mapDel)
+	{
+		int key = i.first;
+		int value = i.second;
+		ASSERT_EQ(value, key * key);
+		touchElement(mapDel, key, 1);
+	}
+	bool exceptionAppears = false;
+	try
+	{
+		int value = (*beginIter).second;
+	}
+	catch (std::out_of_range& e)
+	{
+		exceptionAppears = true;
+	}
+	ASSERT_TRUE(exceptionAppears);
 }

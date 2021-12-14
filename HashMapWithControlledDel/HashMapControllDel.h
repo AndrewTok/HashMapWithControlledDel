@@ -3,7 +3,6 @@
 #include <iostream>
 #include <unordered_map>
 #include <stdlib.h>
-//#include "HashMapCDIter.h"
 
 
 template<class KeyType, class ValueType, class Hash = std::hash<KeyType>,
@@ -15,16 +14,10 @@ class HashMapControllDel
 public:
 	using value_type = std::pair<const KeyType, ValueType>;
 	using size_type = size_t;
-	//using difference_type = typename umap_type::difference_type;
-	//using hasher = Hash;
 	using key_type = KeyType;
 	using mapped_type = ValueType;
-	//using key_equal = KeyEqual;
-	//using allocator_type = Allocator;
 	using reference = value_type&;
-	//using const_reference = const value_type&;
 	using pointer = typename std::allocator_traits<Allocator>::pointer;
-	//using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
 	
 	using umapIterator = typename umap_type::iterator;
 
@@ -36,16 +29,15 @@ private:
 
 	class HashMapCDIter final
 	{
+		HashMapControllDel<KeyType, ValueType>& map;
 		friend HashMapControllDel;
-		//typedef typename std::unordered_map<KeyType, ValueType>::iterator umapIter;
-		//typedef std::pair<const KeyType, ValueType> value_type;
 		umap_type& umap;
 		Strategy<KeyType>& strategy;
+		
 		umapIterator iter;
-
-		HashMapCDIter(std::unordered_map<KeyType, ValueType>& _umap,
-			Strategy<KeyType>& _strategy, umapIterator _currIter)
-			: umap(_umap), strategy(_strategy), iter(_currIter) {}
+		
+		HashMapCDIter(HashMapControllDel<KeyType, ValueType>& _map, umapIterator _currIter) 
+			: map(_map), iter(_currIter), umap(map.umap), strategy(map.strategy) {}
 
 	public:
 		using difference_type = size_type;
@@ -107,7 +99,7 @@ public:
 		if (isInsertable)
 		{
 			std::pair<umapIterator, bool> insertedStat = umap.insert(_pair);
-			iterator tmpIter(umap, strategy, insertedStat.first);
+			iterator tmpIter(*this, insertedStat.first); 
 			bool success = insertedStat.second;
 			return std::pair<iterator, bool>(tmpIter, success);
 		}
@@ -117,7 +109,7 @@ public:
 		}
 	}
 
-	void erase(key_type key) //check why universal doesnt work
+	void erase(key_type key)
 	{
 		strategy.remove(key);
 		umap.erase(key);
@@ -146,21 +138,33 @@ public:
 
 	iterator begin() 
 	{
-		iterator tmp(umap, strategy, umap.begin());
-		return tmp;
+		auto umapIter = umap.begin();
+		key_type key = (*umapIter).first;
+		while (!strategy.check(key))
+		{
+			++umapIter;
+			if (umapIter == umap.end())
+			{
+				break;
+			}
+			else
+			{
+				key = (*umapIter).first;
+			}
+		}
+		return iterator(*this, umapIter);
 	}
 
 	iterator end() 
 	{
-		iterator tmp(umap, strategy, umap.end());
-		return tmp;
+		return iterator(*this, umap.end());
 	}
 
 private:
 
 	iterator getIter(const key_type& key)
 	{
-		return iterator(umap, strategy, umap.find(key));
+		return iterator(*this, umap.find(key)); 
 	}
 
 };

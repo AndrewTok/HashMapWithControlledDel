@@ -22,7 +22,7 @@ public:
 		{
 			return false;
 		}
-		std::time_t lifeDuration = std::time(nullptr) - startLifeTimes[key];
+		std::time_t lifeDuration = std::time(0) - startLifeTimes[key];
 		return lifeDuration < timeout;
 	}
 
@@ -33,13 +33,13 @@ public:
 
 	virtual bool insert(const KeyType& key)
 	{
-		time_t currTime = std::time(nullptr); // check time for err
+		time_t currTime = std::time(0);
 		std::pair<iterator, bool> insertResult = startLifeTimes.insert(std::pair<const KeyType, time_t>(key, currTime));
 		return insertResult.second;
 	}
 
 	virtual bool check(const KeyType& key)
 	{
-		return ((startLifeTimes.find(key) != startLifeTimes.end()) && (startLifeTimes[key] < timeout));
+		return ((startLifeTimes.find(key) != startLifeTimes.end()) && ((std::time(0) - startLifeTimes[key]) < timeout));
 	}
 };

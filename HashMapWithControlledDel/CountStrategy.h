@@ -6,7 +6,6 @@ template<class KeyType>
 class CountStrategy final : public Strategy<KeyType>
 {
 
-
 	size_t numberWhenDel;
 
 	std::unordered_map<KeyType, size_t> countTable;
