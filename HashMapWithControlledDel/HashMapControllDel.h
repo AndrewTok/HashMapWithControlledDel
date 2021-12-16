@@ -139,6 +139,10 @@ public:
 	iterator begin() 
 	{
 		auto umapIter = umap.begin();
+		if (umapIter == umap.end())
+		{
+			return iterator(*this, umapIter);
+		}
 		key_type key = (*umapIter).first;
 		while (!strategy.check(key))
 		{

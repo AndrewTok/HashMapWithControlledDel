@@ -1,20 +1,28 @@
 #pragma once
-#include <ctime>
+#include <thread>
+#include <chrono>
 #include <unordered_map>
 #include "Strategy.h"
 
 template<class KeyType>
 class TimeoutStrategy final : public Strategy<KeyType>
 {
-	std::time_t timeout;
 
-	std::unordered_map<KeyType, time_t> startLifeTimes;
+	using duration = std::chrono::system_clock::duration;
 
-	using iterator = typename std::unordered_map<KeyType, time_t>::iterator;
+	using time_point = std::chrono::system_clock::time_point;
+
+	duration timeout;
+
+
+
+	std::unordered_map<KeyType, time_point> startLifeTimes;
+
+	using iterator = typename std::unordered_map<KeyType, time_point>::iterator;
 
 public:
 
-	TimeoutStrategy(time_t _timeout) : timeout(_timeout) {}
+	TimeoutStrategy(duration _timeout) : timeout(_timeout) {}
 
 	virtual bool access(const KeyType& key)
 	{
@@ -22,8 +30,8 @@ public:
 		{
 			return false;
 		}
-		std::time_t lifeDuration = std::time(0) - startLifeTimes[key];
-		return lifeDuration < timeout;
+		//duration lifeDuration = std::time(0) - startLifeTimes[key];
+		return std::chrono::system_clock::now() - startLifeTimes[key] < timeout; //lifeDuration < timeout;
 	}
 
 	virtual void remove(const KeyType& key)
@@ -33,13 +41,13 @@ public:
 
 	virtual bool insert(const KeyType& key)
 	{
-		time_t currTime = std::time(0);
-		std::pair<iterator, bool> insertResult = startLifeTimes.insert(std::pair<const KeyType, time_t>(key, currTime));
+		time_point currTime = std::chrono::system_clock::now();
+		std::pair<iterator, bool> insertResult = startLifeTimes.insert(std::pair<const KeyType, time_point>(key, currTime));
 		return insertResult.second;
 	}
 
 	virtual bool check(const KeyType& key)
 	{
-		return ((startLifeTimes.find(key) != startLifeTimes.end()) && ((std::time(0) - startLifeTimes[key]) < timeout));
+		return ((startLifeTimes.find(key) != startLifeTimes.end()) && ((std::chrono::system_clock::now() - startLifeTimes[key]) < timeout));
 	}
 };

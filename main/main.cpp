@@ -2,8 +2,9 @@
 #include "CountStrategy.h"
 #include "TimeoutStrategy.h"
 #include "EmptyStrategy.h"
-#include <Windows.h>
 #include <iostream>
+
+using namespace std::chrono;
 
 int main()
 {
@@ -23,14 +24,13 @@ int main()
 	std::cout << b << std::endl;
 	int c = mapDel[2];
 	std::cout << c << std::endl;
-	TimeoutStrategy<int> tmStrategy(10);
+	TimeoutStrategy<int> tmStrategy(10s);
 	HashMapControllDel<int, int> mapTime(tmStrategy);
 	mapTime[2] = 4;
-	Sleep(5000);
+	std::this_thread::sleep_for(5s);
 	std::cout << mapTime[2] << std::endl;
-	Sleep(5250);
+	std::this_thread::sleep_for(5s);
 	std::cout << tmStrategy.check(2) << " " << mapTime[2] << std::endl;
-	std::cout << std::time(nullptr) << std::endl;
 	EmptyStrategy<int> emptyStrat;
 	HashMapControllDel<int, int> mapEmpty(emptyStrat);
 	mapEmpty[2] = 4;
