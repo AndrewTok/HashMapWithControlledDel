@@ -36,7 +36,7 @@ private:
 		
 		umapIterator iter;
 		
-		HashMapCDIter(HashMapControllDel<KeyType, ValueType>& _map, umapIterator _currIter) 
+		HashMapCDIter(HashMapControllDel& _map, umapIterator _currIter) 
 			: map(_map), iter(_currIter), umap(map.umap), strategy(map.strategy) {}
 
 	public:
@@ -65,18 +65,15 @@ private:
 			return *this;
 		}
 
-		value_type operator*() const
+		reference operator*() const
 		{
 			KeyType key = (*iter).first;
 			bool isAccessible = strategy.access(key);
 			if (isAccessible)
 			{
-				return value_type(key, umap.at(key));
+				return (*iter);
 			}
-			else
-			{
-				throw std::out_of_range("unavailable object");
-			}
+			throw std::out_of_range("unavailable object");
 
 		}
 
@@ -101,12 +98,9 @@ public:
 			std::pair<umapIterator, bool> insertedStat = umap.insert(_pair);
 			iterator tmpIter(*this, insertedStat.first); 
 			bool success = insertedStat.second;
-			return std::pair<iterator, bool>(tmpIter, success);
+			return { tmpIter, success };
 		}
-		else
-		{
-			return std::pair<iterator, bool>(getIter(_pair.first), false);
-		}
+		return { getIter(_pair.first), false };
 	}
 
 	void erase(key_type key)
